@@ -30,8 +30,8 @@
 // Use hardware SPI for the remaining pins
 // On an UNO, SCK = 13, MISO = 12, and MOSI = 11
 
-#define WLAN_SSID       ""           // cannot be longer than 32 characters!
-#define WLAN_PASS       ""
+#define WLAN_SSID       "jankyrangers"           // cannot be longer than 32 characters!
+#define WLAN_PASS       "getonjankyrangers"
 // Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
 #define WLAN_SECURITY   WLAN_SEC_WPA2
 
@@ -42,8 +42,8 @@
 #define WEBSITE      "api.thingspeak.com"
 #define WEBPAGE      "/update"
 
-Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
-                                         SPI_CLOCK_DIVIDER); // you can change this clock speed
+//Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
+//                                         SPI_CLOCK_DIVIDER); // you can change this clock speed
                                          
 Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
 
@@ -64,10 +64,21 @@ void setup(void)
   delay(3000);
   bmp.begin();
   delay(1000);
-  
-  int pressure;
 //  readBMP180(&temperature, &pressure);
   // temp and pressure
+
+//  Serial.println(temperature);
+
+  
+//  Serial.println(F("Hello, CC3000!\n")); 
+
+//  Serial.print("Free RAM: "); Serial.println(getFreeRam(), DEC);
+ 
+}
+
+void loop(){ 
+
+  int pressure;
   sensors_event_t event;
   bmp.getEvent(&event);
   float celsius;
@@ -77,12 +88,10 @@ void setup(void)
     delay(500);
   }while(!event.pressure);
   int fahrenheit = (celsius*1.8)+32;
-//  Serial.println(temperature);
+    Serial.println("------- BEGIN --------");
 
-  
-//  Serial.println(F("Hello, CC3000!\n")); 
-
-//  Serial.print("Free RAM: "); Serial.println(getFreeRam(), DEC);
+Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ, ADAFRUIT_CC3000_VBAT,
+                                         SPI_CLOCK_DIVIDER); // you can change this clock speed
   
   /* Initialise the module */
 //  Serial.println(F("\nInitializing..."));
@@ -91,8 +100,7 @@ void setup(void)
 //    Serial.println(F("E:wiring?"));
     while(1);
   }
-  
-  
+
   // Optional SSID scan
   // listSSIDResults();
   
@@ -138,10 +146,12 @@ void setup(void)
   /* Try connecting to the website.
      Note: HTTP/1.1 protocol is used to keep the server from closing the connection before all data is read.
   */
+  
+
   Adafruit_CC3000_Client www = cc3000.connectTCP(ip, 80);
   if (www.connected()) {
     String webpage = "/update?key=";
-    String key = "";
+    String key = "EAXOWK7YC7SRDY1W";
     String data1 = "&field1=";
     String data2 = "&field3=";
     String tempString = String(fahrenheit);
@@ -172,13 +182,20 @@ void setup(void)
     }
   }
   www.close();
+  
 //  Serial.println(F("-------------------------------------"));
   
   /* You need to make sure to clean up after yourself or the CC3000 can freak out */
   /* the next time your try to connect ... */
 //  Serial.println(F("\n\nDisconnecting"));
+
   cc3000.disconnect();
+  Serial.println("------- DISCONNECT --------");
   
+  cc3000.stop();
+  Serial.println("------- END --------");
+
+  delay(10000);
 }
 
 //void readBMP180(int *temperature, int *pressure){
@@ -225,10 +242,6 @@ void setup(void)
 //  float fahrenheit = (celsius*1.8)+32;
 //}
 
-void loop(void)
-{
- delay(1000);
-}
 
 /**************************************************************************/
 /*!
