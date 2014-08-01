@@ -33,7 +33,7 @@
 #define WLAN_SSID       ""           // cannot be longer than 32 characters!
 #define WLAN_PASS       ""
 // Security can be WLAN_SEC_UNSEC, WLAN_SEC_WEP, WLAN_SEC_WPA or WLAN_SEC_WPA2
-#define WLAN_SECURITY   WLAN_SEC_UNSEC //WLAN_SEC_WPA2
+#define WLAN_SECURITY   WLAN_SEC_WPA2
 
 #define IDLE_TIMEOUT_MS  3000      // Amount of time to wait (in milliseconds) with no data 
                                    // received before closing the connection.  If you know the server
@@ -50,22 +50,36 @@ Adafruit_BMP085_Unified bmp = Adafruit_BMP085_Unified(10085);
 uint32_t ip;
 
 
-char *dtostrf (double val, signed char width, unsigned char prec, char *sout) {
-  char fmt[20];
-  sprintf(fmt, "%%%d.%df", width, prec);
-  sprintf(sout, fmt, val);
-  return sout;
-}
+//char *dtostrf (double val, signed char width, unsigned char prec, char *sout) {
+//  char fmt[20];
+//  sprintf(fmt, "%%%d.%df", width, prec);
+//  sprintf(sout, fmt, val);
+//  return sout;
+//}
 
 
 void setup(void)
 { 
+  Serial.begin(115200);
   delay(3000);
   bmp.begin();
   delay(1000);
-  readBMP180();
+  
+  int pressure;
+//  readBMP180(&temperature, &pressure);
+  // temp and pressure
+  sensors_event_t event;
+  bmp.getEvent(&event);
+  float celsius;
+  do{
+    pressure = int(event.pressure); 
+    bmp.getTemperature(&celsius);
+    delay(500);
+  }while(!event.pressure);
+  int fahrenheit = (celsius*1.8)+32;
+//  Serial.println(temperature);
 
-  Serial.begin(115200);
+  
 //  Serial.println(F("Hello, CC3000!\n")); 
 
 //  Serial.print("Free RAM: "); Serial.println(getFreeRam(), DEC);
@@ -74,7 +88,7 @@ void setup(void)
 //  Serial.println(F("\nInitializing..."));
   if (!cc3000.begin())
   {
-    Serial.println(F("E:wiring?"));
+//    Serial.println(F("E:wiring?"));
     while(1);
   }
   
@@ -104,7 +118,7 @@ void setup(void)
 
   ip = 0;
   // Try looking up the website's IP address
-  Serial.print(WEBSITE); Serial.print(F(" -> "));
+//  Serial.print(WEBSITE); Serial.print(F(" -> "));
   while (ip == 0) {
     if (! cc3000.getHostByName(WEBSITE, &ip)) {
 //      Serial.println(F("Couldn't resolve!"));
@@ -112,7 +126,7 @@ void setup(void)
     delay(500);
   }
 
-  cc3000.printIPdotsRev(ip);
+//  cc3000.printIPdotsRev(ip);
   
   // Optional: Do a ping test on the website
   /*
@@ -128,8 +142,11 @@ void setup(void)
   if (www.connected()) {
     String webpage = "/update?key=";
     String key = "";
-    String data = "&field4=9";
-    String postMessage = webpage + key + data;
+    String data1 = "&field1=";
+    String data2 = "&field3=";
+    String tempString = String(fahrenheit);
+    String pressString = String(pressure);
+    String postMessage = webpage + key + data1 + tempString + data2 + pressString;
     char msg[postMessage.length() + 1];  // + 1 for the null character 
     postMessage.toCharArray(msg, postMessage.length() + 1);
     www.fastrprint(F("POST "));
@@ -164,16 +181,22 @@ void setup(void)
   
 }
 
-void readBMP180(){
-  // temp and pressure
-  sensors_event_t event;
-  bmp.getEvent(&event);
-  float pressure, temperature;
-  do{
-    pressure = event.pressure; 
-    bmp.getTemperature(&temperature);
-    delay(500);
-  }while(!event.pressure);
+//void readBMP180(int *temperature, int *pressure){
+//  // temp and pressure
+//  sensors_event_t event;
+//  bmp.getEvent(&event);
+//  int p;
+//  float t;
+//  do{
+//    p = int(event.pressure); 
+//    bmp.getTemperature(&t);
+//    delay(500);
+//  }while(!event.pressure);
+////  Serial.println(t);
+//  int temp = int(t);
+//  Serial.println(temp);
+//  temperature = &temp;
+//  pressure = &p;
   
 //  char tempChars[10];
 //  char humidChars[10];
@@ -185,9 +208,9 @@ void readBMP180(){
 //  String humidStr = humidChars;
 //  String pressStr = pressChars;
 //  String sendStr = "key=EAXOWK7YC7SRDY1W&field1=" + tempStr + "&field2=" + humidStr + "&field3=" + pressStr;
-  Serial.println(temperature);
-  Serial.println(pressure);
-}
+//  Serial.println(temperature);
+//  Serial.println(pressure);
+//}
 
 //void readDHT{ 
 //// humidity

@@ -1,17 +1,14 @@
 # weather station
 
-# arduino (leonardo)
+sketch size < 28,672 bytes
 
-sketch size (MAX) 28,672 bytes
+# parts
 
-# adafruit CC3000
+* arduino (leonardo/uno/etc..)
+* adafruit CC3000 wifi shield
+* adafruit BMP180 pressure + temperature
+* adafruit DHT11 humidity + temperature
 
-wifi shield
+# also
 
-# adafruit BMP180
-
-pressure + temperature
-
-# adafruit DHT11
-
-humidity + temperature
+* a thingspeak channel (https://thingspeak.com/)
