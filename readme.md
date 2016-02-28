@@ -1,15 +1,16 @@
-# weather station
+# arduino weather station
 
-sketch size < 28,672 bytes
+# reader
 
-# parts for the station
+fetch from darksky api
 
-* arduino (leonardo/uno/etc..)
-* adafruit CC3000 wifi shield
+* neopixel ring
+* dual segment display
+
+# sensor
+
+broadcast to a [thingspeak](https://thingspeak.com/) channel 
+
+* arduino yun or CC3000 wifi shield
 * adafruit BMP180 pressure + temperature
 * adafruit DHT humidity + temperature
-* a thingspeak channel (https://thingspeak.com/)
-
-# iOS app
-
-remotely check weather data being hosted on thingspeak

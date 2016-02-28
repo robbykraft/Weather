@@ -1,5 +1,8 @@
 #include <ArduinoJson.h>
 #include <Bridge.h>
+#include "dualSegmentDisplay.h"
+
+DualSegmentDisplay dualSegment;
 
 void setup() {
   Bridge.begin();
@@ -7,11 +10,13 @@ void setup() {
   while (!Console);
   Console.println("Console connected!");
 
+  dualSegment.setup();
   //  runCurl();
 }
 
 
 void loop() {
+  //dualSegment.loop();
   Console.println("In loop");
   runCurl();
   delay(5000);
