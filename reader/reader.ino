@@ -2,9 +2,13 @@
 #include <Bridge.h>
 #include "dualSegmentDisplay.h"
 
-DualSegmentDisplay dualSegment;
+// time in milliseconds
+#define THREE_MINUTES 180000
+#define TEN_MINUTES 600000
+#define THIRTY_MINUTES 1800000
 
 unsigned long lastReadTime;
+DualSegmentDisplay dualSegment;
 
 void setup() {
   Bridge.begin();
@@ -13,15 +17,14 @@ void setup() {
 //  Console.println("Console connected!");
 
   dualSegment.setup();
-  dualSegment.setNumber( runCurl() );
-  lastReadTime = millis();
+  // 2 minutes, wait for WIFI to connect
+  lastReadTime = millis() + THREE_MINUTES;  
 }
-
 
 void loop() {
   dualSegment.loop();
 
-  if(millis() > lastReadTime + 600000 ){   // 10 minutes
+  if(millis() > lastReadTime + TEN_MINUTES){  
     dualSegment.setNumber( runCurl() );
     lastReadTime = millis();
   }
@@ -50,14 +53,11 @@ double runCurl() {
     Console.println("No bytes");
   }
 
-
   char *response = (char*)malloc(sizeof(char) * 600);
   processResponse(&p, response);
   double temp = getTempFromResponse(response);
   Console.println("Temperature");
   Console.println(temp);
-
-
   
   free(response);
   Console.flush();

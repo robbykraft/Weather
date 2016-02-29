@@ -74,13 +74,13 @@ class DualSegmentDisplay{
 		digitalWrite(10, HIGH);
 		delay(MULTIPLEX_DELAY);
 		digitalWrite(10, LOW);
-		setDigit(-1);
+//		setDigit(-1);
 
 		setDigit(digit2);
 		digitalWrite(11, HIGH);
 		delay(MULTIPLEX_DELAY);
 		digitalWrite(11, LOW);
-		setDigit(-1);
+//		setDigit(-1);
 	}
 
 	private:
