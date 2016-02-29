@@ -4,25 +4,30 @@
 
 DualSegmentDisplay dualSegment;
 
+unsigned long lastReadTime;
+
 void setup() {
   Bridge.begin();
-  Console.begin();
-  while (!Console);
-  Console.println("Console connected!");
+//  Console.begin();
+//  while (!Console);
+//  Console.println("Console connected!");
 
   dualSegment.setup();
-  //  runCurl();
+  dualSegment.setNumber( runCurl() );
+  lastReadTime = millis();
 }
 
 
 void loop() {
-  //dualSegment.loop();
-  Console.println("In loop");
-  runCurl();
-  delay(5000);
+  dualSegment.loop();
+
+  if(millis() > lastReadTime + 600000 ){   // 10 minutes
+    dualSegment.setNumber( runCurl() );
+    lastReadTime = millis();
+  }
 }
 
-void runCurl() {
+double runCurl() {
   Console.println("Running curl!");
   Process p;
   p.begin("curl");
@@ -51,9 +56,13 @@ void runCurl() {
   double temp = getTempFromResponse(response);
   Console.println("Temperature");
   Console.println(temp);
+
+
   
   free(response);
   Console.flush();
+
+  return temp;
 }
 
 double getTempFromResponse(char* response) {
