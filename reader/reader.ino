@@ -33,7 +33,7 @@ void setup() {
   setupPixels(); 
   dualSegment.setup();
   // delay first read, wait for WIFI to connect
-  lastReadTime = (millis()-READ_INTERVAL) + THREE_MINUTES;  
+  lastReadTime = (millis()-READ_INTERVAL) + 10000;//THREE_MINUTES;  
 }
 
 void loop() {
@@ -61,17 +61,18 @@ void setPixels(float hours[24]){
   for(int i = 1; i < NUMPIXELS; i++){
     if(hourlyTemp[i] > hourlyTemp[0]){
       float diff = hourlyTemp[i] - hourlyTemp[0];
-      diff *= 3;
-      diff += 1;
+      diff = sqrt(diff * 16);
       if(diff > 50) diff = 50;
       pixels.setPixelColor(i, pixels.Color(diff,0,0));
     }
-    else{
+    else if(hourlyTemp[i] < hourlyTemp[0]){
       float diff = hourlyTemp[0] - hourlyTemp[i];
-      diff *= 3;
-      diff += 1;
+      diff = sqrt(diff * 16);
       if(diff > 50) diff = 50;
       pixels.setPixelColor(i, pixels.Color(0,0,diff));
+    }
+    else{
+      pixels.setPixelColor(i, pixels.Color(0,0,0));
     }
   }
   pixels.show();
