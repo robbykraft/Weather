@@ -2,25 +2,21 @@
 #include <Bridge.h>
 #include "dualSegmentDisplay.h"
 #include <Adafruit_NeoPixel.h>
-
-#define NUMPIXELS 24
-#define PIXELS_PIN 13
-// time in milliseconds
 #define ONE_MINUTE 60000
 #define THREE_MINUTES 180000
 #define TEN_MINUTES 600000
 #define THIRTY_MINUTES 1800000
 
+
+#define READ_INTERVAL TEN_MINUTES  // interval between API fetches
+#define NUMPIXELS 24
+#define PIXELS_PIN 13
+
+
 unsigned long lastReadTime;
 DualSegmentDisplay dualSegment;
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIXELS_PIN, NEO_GRB + NEO_KHZ800);
 float hourlyTemp[24];  // saved weather data
-
-
-// SET THESE
-String DARKSKY_API_KEY = "";
-#define READ_INTERVAL TEN_MINUTES  // interval between API fetch
-
 
 void setup() {
   Bridge.begin();
@@ -32,6 +28,7 @@ void setup() {
   setupPixels(); 
   dualSegment.setup();
   // delay first read to wait for WIFI to connect
+  //   (if hard boot, needs about three minutes to connect)
   lastReadTime = (millis()-READ_INTERVAL) + 10000;//THREE_MINUTES;  
 }
 
@@ -40,7 +37,7 @@ void loop() {
   if(millis() > lastReadTime + READ_INTERVAL){  
     getHourlyFromBridge();
     dualSegment.setNumber( hourlyTemp[0] );
-    setPixels(hourlyTemp);
+    updatePixels();
     lastReadTime = millis();
   }
 }
@@ -56,7 +53,7 @@ void setupPixels(){
   pixels.show();
 }
 
-void setPixels(float hours[24]){
+void updatePixels(){
   pixels.begin();
   pixels.setPixelColor(0, pixels.Color(0,30,0));
   
@@ -92,61 +89,4 @@ void getHourlyFromBridge(){
     Bridge.get(String("D" + String(i)).c_str(), Dvalue, 5);
     hourlyTemp[i] = atof(Dvalue);
   }
-}
-
-double getCurrentFromCurl() {
-  Console.println("Running curl!");
-  Process p;
-  p.begin("curl");
-  p.addParameter("-k");
-  p.addParameter("--globoff");
-  p.addParameter(String("https://api.forecast.io/forecast/"
-                 + DARKSKY_API_KEY 
-                 + "/40.694,-73.9186?exclude=[minutely,hourly,daily,alerts,flags]").c_str() );
-  p.run();
-  int exitValue = p.exitValue();
-  if (exitValue != 0) {
-    Console.println("Exit value was " + exitValue);
-  } else {
-    Console.println("Success! Exit was 0");
-  }
-  if (p.available() > 0) {
-    Console.println(p.available() + " bytes available");
-  } else {
-    Console.println("No bytes");
-  }
-  char *response = (char*)malloc(sizeof(char) * 600);
-  processResponse(&p, response);
-  double temp = getTempFromResponse(response);
-  Console.println("Temperature");
-  Console.println(temp);
-  free(response);
-  Console.flush();
-  return temp;
-}
-
-double getTempFromResponse(char* response) {
-  StaticJsonBuffer<500> jsonBuffer;
-  JsonObject& root = jsonBuffer.parseObject(response);
-    if (!root.success()) {
-      Console.println("Failed!");
-      return 0.00;
-  }
-  JsonObject& current = root["currently"];
-  if (!current.success()) {
-    Console.println("Current failed!");
-    return 0.00;
-  }
-  double temp = current["temperature"];
-  return temp;
-}
-
-void processResponse(Process* proc, char* response) {
-  int i = 0;
-  while (proc->available() > 0) {
-    char c = proc->read();
-    response[i] = c;
-    i++;
-  }
-  response[i] = '\0';
 }
