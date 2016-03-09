@@ -29,7 +29,7 @@ class DualSegmentDisplay{
 	int digit1;
 	int digit2;
 
-	void setNumber(int number){
+	void setInteger(int number){
 		if(number < 100 && number > -10){
 			if(number < 0){
 				digit1 = MINUS;
@@ -71,15 +71,15 @@ class DualSegmentDisplay{
 	
 	void loop(){
 		setDigit(digit1);
-		digitalWrite(10, HIGH);
+		digitalWrite(GROUND_LEFT, HIGH);
 		delay(MULTIPLEX_DELAY);
-		digitalWrite(10, LOW);
+		digitalWrite(GROUND_LEFT, LOW);
 //		setDigit(-1);
 
 		setDigit(digit2);
-		digitalWrite(11, HIGH);
+		digitalWrite(GROUND_RIGHT, HIGH);
 		delay(MULTIPLEX_DELAY);
-		digitalWrite(11, LOW);
+		digitalWrite(GROUND_RIGHT, LOW);
 //		setDigit(-1);
 	}
 

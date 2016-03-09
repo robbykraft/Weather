@@ -12,6 +12,9 @@ response = urllib2.urlopen(url)
 data = json.loads(response.read())
 a = data['hourly']['data']
 for i in range(len(a)):
-    stringName = 'D' + str(i)
+    tempString = 'D' + str(i)
+    precipString = 'P' + str(i)
     temp = '%.2f' % float( a[i]['temperature'] )
-    value.put(stringName, temp)
+    precip = '%.2f' % float( a[i]['precipProbability'] )
+    value.put(tempString, temp)
+    value.put(precipString, precip)
