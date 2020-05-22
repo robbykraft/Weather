@@ -1,23 +1,17 @@
-# arduino weather station
+# Weather Clock
 
-# reader
+This is a weather clock that tells you the next 24 hours of data; the current temperature; and each pixel clockwise is one hour into the future, warmer or colder than now, and whether or not it's raining during that hour.
 
-visualizes next 24 hrs of weather using [darksky api](https://developer.forecast.io/)
+Uses the [Darksky API](https://darksky.net/dev/docs) (which will remain in service through the end of 2021).
 
-* neopixel ring
-* dual segment display
-* Arduino Yún, updated:
+### Parts
 
-```
-opkg update
-opkg install python-openssl
-opkg upgrade cpu-mcu-bridge
-```
+- [Particle Photon](https://store.particle.io/products/photon)
+- [Adafruit 24 Neopixel ring](https://www.adafruit.com/product/1586)
+- [Dual alphanumeric display](https://www.adafruit.com/product/2153) (seven segment is fine)
+- [MAX7219 LED display driver](https://www.adafruit.com/product/453)
 
-# sensor
+### Backend
 
-broadcast to a [thingspeak](https://thingspeak.com/) channel 
+The Particle Photon calls a proxy server, which in turn calls the DarkSky API. The proxy server itself requires a password in the query string, it caches the response from the Weather API, cutting down on costs, and it shrinks the JSON response to only what the Arduino needs to know.
 
-* arduino yun or CC3000 wifi shield
-* adafruit BMP180 pressure + temperature
-* adafruit DHT humidity + temperature
